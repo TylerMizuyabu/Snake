@@ -29,6 +29,7 @@ func NewBody(x, y float64) *Body {
 func NewSnake(x, y float64) *Snake {
 	return &Snake{
 		head: NewBody(x, y),
+		heading: up,
 	}
 }
 
@@ -45,23 +46,34 @@ func (s *Snake) AddBody(x, y float64) {
 /*
 Draws each body part of the snake starting with the head
 */
-func (s *Snake) Draw() {
+func (s *Snake) Draw(dst *ebiten.Image) {
 	body := s.head
 	for body != nil {
-		body.Draw()
+		body.Draw(dst)
 		body = body.next
 	}
 }
 
-// TODO
 func (s *Snake) Move() {
+	nextX, nextY := s.head.x, s.head.y
 	switch s.heading {
 	case up:
+		nextY -= 1
 	case right:
+		nextX +=1
 	case down:
+		nextY += 1
 	case left:
+		nextX -=1
 	default:
 		fmt.Println("Something is wrong")
+	}
+	body := s.head
+	for body != nil {
+		tempX, tempY := body.x, body.y
+		body.x = nextX
+		body.y = nextY
+		nextX, nextY = tempX, tempY
 	}
 }
 

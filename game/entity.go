@@ -15,10 +15,10 @@ func NewEntity(x, y, size float64, image *ebiten.Image) *Entity {
 	}
 }
 
-func (e *Entity) Draw() {
+func (e *Entity) Draw(dst *ebiten.Image) {
 	geom := ebiten.GeoM{}
 	geom.Translate(e.x, e.y)
-	e.image.DrawImage(e.image, &ebiten.DrawImageOptions{
+	dst.DrawImage(e.image, &ebiten.DrawImageOptions{
 		GeoM:          geom,
 		ColorM:        ebiten.ColorM{},
 		CompositeMode: 0,
