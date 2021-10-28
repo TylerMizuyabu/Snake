@@ -28,6 +28,8 @@ type Game struct {
 	apple    *Apple
 }
 
+var i = 0
+
 func NewGame() *Game {
 	return &Game{
 		gameOver: false,
@@ -35,6 +37,7 @@ func NewGame() *Game {
 		apple:    NewApple(rand.Float64()*boardSize, rand.Float64()*boardSize),
 	}
 }
+
 
 func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
@@ -57,10 +60,13 @@ func (g *Game) Update() error {
 		g.snake.ChangeDirection(left)
 	}
 
-	g.snake.Move()
-	g.gameOver = g.snake.HitWall()
+	if i % 4 == 0 {
+		g.snake.Move()
+	}
+	i++
+	g.gameOver = g.snake.HitWall() || g.snake.HitItself()
 	if g.snake.head.HasCollided(g.apple.Entity) {
-		g.snake.AddBody(g.apple.x,g.apple.y)
+		g.snake.AddBody()
 		g.apple.SetCoordinates(rand.Float64()*boardSize, rand.Float64()*boardSize)
 	}
 	return nil

@@ -9,6 +9,7 @@ import (
 
 type Snake struct {
 	head    *Body
+	tail 	*Body
 	heading direction
 }
 
@@ -27,20 +28,18 @@ func NewBody(x, y float64) *Body {
 }
 
 func NewSnake(x, y float64) *Snake {
+	head := NewBody(x, y)
 	return &Snake{
-		head:    NewBody(x, y),
+		head:    head,
+		tail: head,
 		heading: up,
 	}
 }
 
-/*
-The idea behind this is that when the snake eats the food, instead of adding a body part
-to the end of the snake we make one where the food use to be and set it as the snakes new head
-*/
-func (s *Snake) AddBody(x, y float64) {
-	newHead := NewBody(x, y)
-	newHead.next = s.head
-	s.head = newHead
+// TODO WIP
+func (s *Snake) AddBody() {
+	s.tail.next = NewBody(s.tail.x, s.tail.y+cellSize)
+	s.tail = s.tail.next
 }
 
 /*
@@ -58,17 +57,17 @@ func (s *Snake) Move() {
 	nextX, nextY := s.head.x, s.head.y
 	switch s.heading {
 	case up:
-		nextY -= 0.5
+		s.head.y -= cellSize
 	case right:
-		nextX += 0.5
+		s.head.x +=cellSize
 	case down:
-		nextY += 0.5
+		s.head.y += cellSize
 	case left:
-		nextX -= 0.5
+		s.head.x -= cellSize
 	default:
 		fmt.Println("Something is wrong")
 	}
-	body := s.head
+	body := s.head.next
 	for body != nil {
 		tempX, tempY := body.x, body.y
 		body.x = nextX
@@ -82,12 +81,26 @@ func (s *Snake) Move() {
 Updates the snakes direction. For now it's working off the knowledge that left is the largest
 direction by numerical value and up is the smallest
 */
-func (s *Snake) ChangeDirection(d direction) {
+func (s *Snake) ChangeDirection(d direction) { 
 	if d >= up && d <= left {
-		s.heading = d
+		diff := s.heading - d
+		if diff != -2 && diff != 2 {
+			s.heading = d
+		}
 	}
 }
 
 func (s *Snake) HitWall() bool {
-	return s.head.x < 0 || s.head.x > boardSize || s.head.y < 0 || s.head.y > boardSize
+	return s.head.x < 0 || s.head.x+cellSize*0.6 > boardSize || s.head.y < 0 || s.head.y+cellSize*0.6 > boardSize
+}
+
+// TODO WIP
+func (s *Snake) HitItself() bool {
+	// body := s.head.next 
+	// for body != nil {
+	// 	if s.head.HasCollided(body.Entity) {
+	// 		return true
+	// 	}
+	// }
+	return false
 }
