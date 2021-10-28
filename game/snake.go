@@ -8,7 +8,7 @@ import (
 )
 
 type Snake struct {
-	head *Body
+	head    *Body
 	heading direction
 }
 
@@ -22,13 +22,13 @@ func NewBody(x, y float64) *Body {
 	image.Fill(color.White)
 	return &Body{
 		Entity: NewEntity(x, y, cellSize, image),
-		next: nil,
+		next:   nil,
 	}
 }
 
 func NewSnake(x, y float64) *Snake {
 	return &Snake{
-		head: NewBody(x, y),
+		head:    NewBody(x, y),
 		heading: up,
 	}
 }
@@ -58,13 +58,13 @@ func (s *Snake) Move() {
 	nextX, nextY := s.head.x, s.head.y
 	switch s.heading {
 	case up:
-		nextY -= 1
+		nextY -= 0.5
 	case right:
-		nextX +=1
+		nextX += 0.5
 	case down:
-		nextY += 1
+		nextY += 0.5
 	case left:
-		nextX -=1
+		nextX -= 0.5
 	default:
 		fmt.Println("Something is wrong")
 	}
@@ -83,7 +83,11 @@ Updates the snakes direction. For now it's working off the knowledge that left i
 direction by numerical value and up is the smallest
 */
 func (s *Snake) ChangeDirection(d direction) {
-	if (d >= up && d <= left) {
+	if d >= up && d <= left {
 		s.heading = d
 	}
-} 
+}
+
+func (s *Snake) HitWall() bool {
+	return s.head.x < 0 || s.head.x > boardSize || s.head.y < 0 || s.head.y > boardSize
+}
