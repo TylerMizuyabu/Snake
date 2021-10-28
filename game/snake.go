@@ -74,6 +74,7 @@ func (s *Snake) Move() {
 		body.x = nextX
 		body.y = nextY
 		nextX, nextY = tempX, tempY
+		body = body.next
 	}
 }
 

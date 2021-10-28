@@ -8,7 +8,7 @@ import (
 func main() {
 	ebiten.SetWindowSize(800,800)
 	ebiten.SetWindowTitle("Snake")
-	game := &game.Game{}
+	game := game.NewGame()
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}

@@ -44,7 +44,8 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		g.snake.ChangeDirection(left)
 	}
-	
+
+	g.snake.Move()
 	return nil
 }
 
