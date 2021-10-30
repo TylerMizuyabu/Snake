@@ -8,6 +8,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+const (
+	startSpeed = time.Millisecond * 100
+	minSpeed = time.Millisecond * 30
+)
+
 type Snake struct {
 	head       *Body
 	tail       *Body
@@ -39,7 +44,7 @@ func NewSnake(x, y float64) *Snake {
 		tail:       head,
 		heading:    up,
 		stopMoving: make(chan bool),
-		speed:      time.Nanosecond * 100000000 ,
+		speed:      startSpeed ,
 	}
 }
 
@@ -92,7 +97,7 @@ func (s *Snake) StartMove() {
 			default:
 				s.move()
 			}
-			// time.Sleep(s.speed)
+			time.Sleep(s.speed)
 		}
 	}()
 }
@@ -103,7 +108,9 @@ func (s *Snake) StopMove() {
 
 
 func (s *Snake) SpeedUp() {
-	s.speed -= 100*time.Millisecond
+	if s.speed > minSpeed {
+		s.speed -= 10*time.Millisecond
+	}
 }
 
 /*
