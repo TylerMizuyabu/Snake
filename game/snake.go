@@ -39,7 +39,7 @@ func NewSnake(x, y float64) *Snake {
 		tail:       head,
 		heading:    up,
 		stopMoving: make(chan bool),
-		speed:      time.Millisecond * 100,
+		speed:      time.Nanosecond * 100000000 ,
 	}
 }
 
@@ -90,9 +90,9 @@ func (s *Snake) StartMove() {
 			case <-s.stopMoving:
 				return
 			default:
-				s.Move()
+				s.move()
 			}
-			time.Sleep(s.speed)
+			// time.Sleep(s.speed)
 		}
 	}()
 }
@@ -101,28 +101,9 @@ func (s *Snake) StopMove() {
 	s.stopMoving <- true
 }
 
-func (s *Snake) Move() {
-	nextX, nextY := s.head.x, s.head.y
-	switch s.heading {
-	case up:
-		s.head.y -= cellSize
-	case right:
-		s.head.x += cellSize
-	case down:
-		s.head.y += cellSize
-	case left:
-		s.head.x -= cellSize
-	default:
-		fmt.Println("Something is wrong")
-	}
-	body := s.head.next
-	for body != nil {
-		tempX, tempY := body.x, body.y
-		body.x = nextX
-		body.y = nextY
-		nextX, nextY = tempX, tempY
-		body = body.next
-	}
+
+func (s *Snake) SpeedUp() {
+	s.speed -= 100*time.Millisecond
 }
 
 /*
@@ -151,4 +132,28 @@ func (s *Snake) HitItself() bool {
 		body = body.next
 	}
 	return false
+}
+
+func (s *Snake) move() {
+	nextX, nextY := s.head.x, s.head.y
+	switch s.heading {
+	case up:
+		s.head.y -= cellSize
+	case right:
+		s.head.x += cellSize
+	case down:
+		s.head.y += cellSize
+	case left:
+		s.head.x -= cellSize
+	default:
+		fmt.Println("Something is wrong")
+	}
+	body := s.head.next
+	for body != nil {
+		tempX, tempY := body.x, body.y
+		body.x = nextX
+		body.y = nextY
+		nextX, nextY = tempX, tempY
+		body = body.next
+	}
 }

@@ -62,6 +62,7 @@ func (g *Game) Update() error {
 
 	if g.snake.head.HasCollided(g.apple.Entity) {
 		g.snake.AddBody()
+		g.snake.SpeedUp()
 		g.apple.SetCoordinates(float64(rand.Intn(boardSize)), float64(rand.Intn(boardSize)))
 	}
 
