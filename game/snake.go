@@ -146,6 +146,7 @@ func (s *Snake) HitItself() bool {
 	body := s.head.next 
 	for body != nil {
 		if s.head.HasCollided(body.Entity) {
+			fmt.Printf("Head x:%f y:%f \nBody x:%f y:%f", s.head.x, s.head.y, body.x, body.y)
 			return true
 		}
 	}
