@@ -12,22 +12,22 @@ const (
 	boardSize = 40.0
 	cellSize  = 1.0
 )
+
 type Game struct {
 	gameStart bool
-	gameOver bool
-	snake    *Snake
-	apple    *Apple
+	gameOver  bool
+	snake     *Snake
+	apple     *Apple
 }
 
 func NewGame() *Game {
 	return &Game{
 		gameStart: false,
-		gameOver: false,
-		snake:    NewSnake(boardSize/2, boardSize/2),
-		apple:    NewApple(rand.Float64()*boardSize, rand.Float64()*boardSize),
+		gameOver:  false,
+		snake:     NewSnake(boardSize/2, boardSize/2),
+		apple:     NewApple(float64(rand.Intn(boardSize)), float64(rand.Intn(boardSize))),
 	}
 }
-
 
 func (g *Game) Update() error {
 	if !g.gameStart {
@@ -38,7 +38,7 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.reset()
 		return nil
-	}else if g.gameOver {
+	} else if g.gameOver {
 		return nil
 	}
 
@@ -62,7 +62,7 @@ func (g *Game) Update() error {
 
 	if g.snake.head.HasCollided(g.apple.Entity) {
 		g.snake.AddBody()
-		g.apple.SetCoordinates(rand.Float64()*boardSize, rand.Float64()*boardSize)
+		g.apple.SetCoordinates(float64(rand.Intn(boardSize)), float64(rand.Intn(boardSize)))
 	}
 
 	return nil
