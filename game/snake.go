@@ -10,7 +10,7 @@ import (
 
 const (
 	startSpeed = time.Millisecond * 100
-	minSpeed = time.Millisecond * 30
+	minSpeed   = time.Millisecond * 30
 )
 
 type Snake struct {
@@ -44,7 +44,7 @@ func NewSnake(x, y float64) *Snake {
 		tail:       head,
 		heading:    up,
 		stopMoving: make(chan bool),
-		speed:      startSpeed ,
+		speed:      startSpeed,
 	}
 }
 
@@ -106,10 +106,9 @@ func (s *Snake) StopMove() {
 	s.stopMoving <- true
 }
 
-
 func (s *Snake) SpeedUp() {
 	if s.speed > minSpeed {
-		s.speed -= 10*time.Millisecond
+		s.speed -= 10 * time.Millisecond
 	}
 }
 
@@ -126,8 +125,8 @@ func (s *Snake) ChangeDirection(d direction) {
 	}
 }
 
-func (s *Snake) HitWall() bool {
-	return s.head.x < 0 || s.head.x+cellSize*0.6 > boardSize || s.head.y < 0 || s.head.y+cellSize*0.6 > boardSize
+func (s *Snake) HitWall(paddingX, paddingY float64) bool {
+	return s.head.x < paddingX || s.head.x+cellSize*0.6 > boardSize + paddingX || s.head.y < paddingY || s.head.y+cellSize*0.6 > paddingY + boardSize
 }
 
 func (s *Snake) HitItself() bool {

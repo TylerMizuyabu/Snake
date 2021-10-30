@@ -1,7 +1,6 @@
 package game
 
 import (
-	"image/color"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,13 +8,14 @@ import (
 )
 
 const (
-	boardSize = 40.0
+	boardSize = 38.0
 	cellSize  = 1.0
 )
 
 type Game struct {
 	gameStart bool
 	gameOver  bool
+	board     *Board
 	snake     *Snake
 	apple     *Apple
 }
@@ -24,8 +24,9 @@ func NewGame() *Game {
 	return &Game{
 		gameStart: false,
 		gameOver:  false,
+		board:     NewBoard(boardSize, boardSize),
 		snake:     NewSnake(boardSize/2, boardSize/2),
-		apple:     NewApple(float64(rand.Intn(boardSize)), float64(rand.Intn(boardSize))),
+		apple:     NewApple(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1))),
 	}
 }
 
@@ -55,7 +56,7 @@ func (g *Game) Update() error {
 		g.snake.ChangeDirection(left)
 	}
 
-	g.gameOver = g.snake.HitWall() || g.snake.HitItself()
+	g.gameOver = g.snake.HitWall(cellSize, cellSize) || g.snake.HitItself()
 	if g.gameOver {
 		g.snake.StopMove()
 	}
@@ -63,25 +64,25 @@ func (g *Game) Update() error {
 	if g.snake.head.HasCollided(g.apple.Entity) {
 		g.snake.AddBody()
 		g.snake.SpeedUp()
-		g.apple.SetCoordinates(float64(rand.Intn(boardSize)), float64(rand.Intn(boardSize)))
+		g.apple.SetCoordinates(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1)))
 	}
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.Black)
+	g.board.Draw(screen)
 	g.apple.Draw(screen)
 	g.snake.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return boardSize, boardSize
+	return boardSize+2*cellSize, boardSize+2*cellSize
 }
 
 func (g *Game) reset() {
 	g.gameOver = false
 	g.gameStart = false
-	g.snake = NewSnake(boardSize/2, boardSize/2)
-	g.apple = NewApple(rand.Float64()*boardSize, rand.Float64()*boardSize)
+	g.snake = NewSnake(cellSize+boardSize/2, cellSize+boardSize/2)
+	g.apple = NewApple(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1)))
 }
