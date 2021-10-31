@@ -1,15 +1,17 @@
 package game
 
 import (
-	"math/rand"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const (
-	boardSize = 38.0
-	cellSize  = 1.0
+	boardSize = 38
+	cellSize  = 1
+)
+
+var (
+	appleCount = 0
 )
 
 type Game struct {
@@ -24,13 +26,15 @@ type Game struct {
 // should just do everything in ints. Convert all float64 into ints. Only cast into float64 when necessary
 
 func NewGame() *Game {
+	board := NewBoard(boardSize, boardSize)
+	minX, minY := board.GetPadding()
 	return &Game{
 		gameStart: false,
 		gameOver:  false,
-		board:     NewBoard(boardSize, boardSize),
-		snake:     NewSnake(boardSize/2, boardSize/2),
+		board:     board,
+		snake:     NewSnake(minX + boardSize/2, minY + boardSize/2),
 		// TODO the apple should probably be able to do this randomization itself given a set of bounds
-		apple:     NewApple(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1))),
+		apple:     NewApple(minX, boardSize, minY, boardSize),
 	}
 }
 
@@ -69,7 +73,11 @@ func (g *Game) Update() error {
 	if g.snake.head.HasCollided(g.apple.Entity) {
 		g.snake.AddBody()
 		g.snake.SpeedUp()
-		g.apple.SetCoordinates(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1)))
+		if appleCount+=1; appleCount % 5 == 0 {
+			g.board.ReduceSize()
+		}
+		minX, minY := g.board.GetPadding()
+		g.apple.NewRandomCoordinates(minX, g.board.width, minY, g.board.height)
 	}
 
 	return nil
@@ -89,6 +97,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func (g *Game) reset() {
 	g.gameOver = false
 	g.gameStart = false
-	g.snake = NewSnake(cellSize+boardSize/2, cellSize+boardSize/2)
-	g.apple = NewApple(float64(cellSize+rand.Intn(int(boardSize)-1)), float64(cellSize+rand.Intn(int(boardSize)-1)))
+	g.board.Reset()
+	minX, minY := g.board.GetPadding()
+	g.snake = NewSnake(minX + boardSize/2, minY + boardSize/2)
+	g.apple = NewApple(minX, boardSize, minY, boardSize)
 }

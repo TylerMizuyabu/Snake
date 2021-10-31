@@ -27,7 +27,7 @@ type Body struct {
 	prev *Body
 }
 
-func NewBody(x, y float64, prev *Body) *Body {
+func NewBody(x, y int, prev *Body) *Body {
 	image := ebiten.NewImage(cellSize, cellSize)
 	image.Fill(color.White)
 	return &Body{
@@ -37,7 +37,7 @@ func NewBody(x, y float64, prev *Body) *Body {
 	}
 }
 
-func NewSnake(x, y float64) *Snake {
+func NewSnake(x, y int) *Snake {
 	head := NewBody(x, y, nil)
 	return &Snake{
 		head:       head,
@@ -125,8 +125,8 @@ func (s *Snake) ChangeDirection(d direction) {
 	}
 }
 
-func (s *Snake) HitWall(paddingX, paddingY float64) bool {
-	return s.head.x < paddingX || s.head.x+cellSize*0.6 > boardSize + paddingX || s.head.y < paddingY || s.head.y+cellSize*0.6 > paddingY + boardSize
+func (s *Snake) HitWall(paddingX, paddingY int) bool {
+	return s.head.x < paddingX || s.head.x >= boardSize + paddingX || s.head.y < paddingY || s.head.y >= paddingY + boardSize
 }
 
 func (s *Snake) HitItself() bool {

@@ -3,13 +3,13 @@ package game
 import "github.com/hajimehoshi/ebiten/v2"
 
 type Entity struct {
-	x     float64
-	y     float64
-	size  float64
+	x     int
+	y     int
+	size  int
 	image *ebiten.Image
 }
 
-func NewEntity(x, y, size float64, image *ebiten.Image) *Entity {
+func NewEntity(x, y, size int, image *ebiten.Image) *Entity {
 	return &Entity{
 		x, y, size, image,
 	}
@@ -17,7 +17,7 @@ func NewEntity(x, y, size float64, image *ebiten.Image) *Entity {
 
 func (e *Entity) Draw(dst *ebiten.Image) {
 	geom := ebiten.GeoM{}
-	geom.Translate(e.x, e.y)
+	geom.Translate(float64(e.x), float64(e.y))
 	dst.DrawImage(e.image, &ebiten.DrawImageOptions{
 		GeoM:          geom,
 		ColorM:        ebiten.ColorM{},
