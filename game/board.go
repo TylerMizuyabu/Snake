@@ -16,8 +16,7 @@ type Board struct {
 	blackSquare    *ebiten.Image
 	originalWidth  int
 	originalHeight int
-	width          int
-	height         int
+	reduceCount    int
 }
 
 func NewBoard(width, height int) *Board {
@@ -36,34 +35,35 @@ func NewBoard(width, height int) *Board {
 		blackSquare:    bs,
 		originalWidth:  width,
 		originalHeight: height,
-		width:          width,
-		height:         height,
+		reduceCount:    0,
 	}
 }
 
 func (b *Board) ReduceSize() {
-	b.width -= 1
-	b.height -= 1
+	if b.originalWidth-b.reduceCount*cellSize <= minWidth || b.originalHeight-b.reduceCount*cellSize <= minHeight {
+		return
+	}
+	b.reduceCount++
 }
 
 func (b *Board) GetSize() (int, int) {
-	return b.width, b.height
+	return b.originalWidth - 2*cellSize*b.reduceCount, b.originalHeight - 2*cellSize*b.reduceCount
 }
 
 func (b *Board) Reset() {
-	b.width = b.originalWidth
-	b.height = b.originalHeight
+	b.reduceCount = 0
 }
 
 func (b *Board) Draw(dest *ebiten.Image) {
 	blackSquareOp := &ebiten.DrawImageOptions{}
-	blackSquareOp.GeoM.Scale(float64(b.width)/float64(b.originalWidth), float64(b.height)/float64(b.originalHeight))
-	blackSquareOp.GeoM.Translate(float64(cellSize)*float64(1+b.originalWidth-b.width), float64(cellSize)*float64(1+b.originalHeight-b.height))
-
+	width, height := b.GetSize()
+	minX, minY := b.GetWallWidth()
+	blackSquareOp.GeoM.Scale(float64(width)/float64(b.originalWidth), float64(height)/float64(b.originalHeight))
+	blackSquareOp.GeoM.Translate(float64(minX), float64(minY))
 	dest.DrawImage(b.whiteSquare, nil)
-	b.whiteSquare.DrawImage(b.blackSquare, blackSquareOp)
+	dest.DrawImage(b.blackSquare, blackSquareOp)
 }
 
-func (b *Board) GetPadding() (int, int) {
-	return cellSize*(1+b.originalWidth-b.width), cellSize*(1+b.originalHeight-b.height)
+func (b *Board) GetWallWidth() (int, int) {
+	return cellSize * (1 + b.reduceCount), cellSize * (1 + b.reduceCount)
 }

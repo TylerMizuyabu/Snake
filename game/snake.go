@@ -126,7 +126,7 @@ func (s *Snake) ChangeDirection(d direction) {
 }
 
 func (s *Snake) HitWall(paddingX, paddingY int) bool {
-	return s.head.x < paddingX || s.head.x >= boardSize + paddingX || s.head.y < paddingY || s.head.y >= paddingY + boardSize
+	return s.head.x < paddingX || s.head.x >= boardSize+paddingX || s.head.y < paddingY || s.head.y >= paddingY+boardSize
 }
 
 func (s *Snake) HitItself() bool {

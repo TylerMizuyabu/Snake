@@ -22,19 +22,19 @@ type Game struct {
 	apple     *Apple
 }
 
-// TODO instead of doing board size, cellsize and all this other stuff in float64 but making sure that it is not a decimal
-// should just do everything in ints. Convert all float64 into ints. Only cast into float64 when necessary
+// TODO: Contemplate on the current way things are being handled in terms of boundary detection
+// and the coordinate system (now that there are dynamic sizes). Maybe the board struct should
+// handle the snakes collision detection with the wall.
 
 func NewGame() *Game {
 	board := NewBoard(boardSize, boardSize)
-	minX, minY := board.GetPadding()
+	minX, minY := board.GetWallWidth()
 	return &Game{
 		gameStart: false,
 		gameOver:  false,
 		board:     board,
-		snake:     NewSnake(minX + boardSize/2, minY + boardSize/2),
-		// TODO the apple should probably be able to do this randomization itself given a set of bounds
-		apple:     NewApple(minX, boardSize, minY, boardSize),
+		snake:     NewSnake(minX+boardSize/2, minY+boardSize/2),
+		apple: NewApple(minX, boardSize, minY, boardSize),
 	}
 }
 
@@ -64,8 +64,8 @@ func (g *Game) Update() error {
 		g.snake.ChangeDirection(left)
 	}
 
-	// TODO: calculations of collisions should probably be provided a struct representing the bounds of the playable area. Think about this more
-	g.gameOver = g.snake.HitWall(cellSize, cellSize) || g.snake.HitItself()
+	minX, minY := g.board.GetWallWidth()
+	g.gameOver = g.snake.HitWall(minX, minY) || g.snake.HitItself()
 	if g.gameOver {
 		g.snake.StopMove()
 	}
@@ -73,11 +73,21 @@ func (g *Game) Update() error {
 	if g.snake.head.HasCollided(g.apple.Entity) {
 		g.snake.AddBody()
 		g.snake.SpeedUp()
-		if appleCount+=1; appleCount % 5 == 0 {
+		/////////////////////////////////////////
+		// TODO: I don't really like how this is done
+		if appleCount += 1; appleCount%5 == 0 {
 			g.board.ReduceSize()
 		}
-		minX, minY := g.board.GetPadding()
-		g.apple.NewRandomCoordinates(minX, g.board.width, minY, g.board.height)
+		minX, minY = g.board.GetWallWidth()
+		width, height := g.board.GetSize()
+		if appleCount%4 == 0 {
+			minX += cellSize
+			minY += cellSize
+			width -= cellSize
+			height -= cellSize
+		}
+		/////////////////////////////////////////
+		g.apple.NewRandomCoordinates(minX, width, minY, height)
 	}
 
 	return nil
@@ -91,14 +101,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return boardSize+2*cellSize, boardSize+2*cellSize
+	return boardSize + 2*cellSize, boardSize + 2*cellSize
 }
 
 func (g *Game) reset() {
 	g.gameOver = false
 	g.gameStart = false
 	g.board.Reset()
-	minX, minY := g.board.GetPadding()
-	g.snake = NewSnake(minX + boardSize/2, minY + boardSize/2)
+	minX, minY := g.board.GetWallWidth()
+	g.snake = NewSnake(minX+boardSize/2, minY+boardSize/2)
 	g.apple = NewApple(minX, boardSize, minY, boardSize)
 }
